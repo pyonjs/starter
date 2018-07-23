@@ -92,9 +92,8 @@ library(Hmisc)
 graph1 <- ggplot(data = newmousedata, aes(x = obs, y = yij, group = mousenumber))
 
 #spaghetti graph
-graph1 + geom_line(aes(colour=tx))
+graph1 + geom_line(aes(colour=tx)) + geom_point(aes(colour=tx))
 #line graph
-graph1 + geom_point(aes(colour=tx))
 
 graph2 <- ggplot(data = newmousedata, aes(x = obs, y = yij, group = tx))
 graph2 + stat_summary(fun.y = mean, geom = "point", aes(colour=tx)) + stat_summary(fun.y = mean, geom = "line", aes(colour=tx)) + stat_summary(fun.data = mean_cl_normal, geom = "errorbar", aes(colour=tx))
@@ -104,6 +103,66 @@ graph2 + stat_summary(fun.y = mean, geom = "point", aes(colour=tx)) + stat_summa
 #table of averages and sd
 #1-4 are control, 5-8 are tx
 table <- aggregate( yij ~ trial, FUN=function(x) c(mn=mean(x), sd=sd(x)), data=newmousedata)
+
+####################################################################################################################################################################################################################################
+
+library(ggplot2)
+library(plotly)
+library(rmarkdown)
+
+#ggplot
+graph1 <- ggplot(data = newmousedata, aes(x = obs, y = yij, group = mousenumber))
+
+#individual movement
+graph1 + geom_line(aes(colour=tx)) + geom_point(aes(colour=tx)) + labs(x = "time points") + labs(y = "weight")
+
+#movement based on means, with sd
+graph2 <- ggplot(data = newmousedata, aes(x = obs, y = yij, group = tx))
+graph2 + stat_summary(fun.y = mean, geom = "point", aes(colour=tx)) + stat_summary(fun.y = mean, geom = "line", aes(colour=tx)) + stat_summary(fun.data = mean_cl_normal, geom = "errorbar", aes(colour=tx)) + labs(x = "time points") + labs(y = "weight")
+
+#plotly
+#individual tx movement
+plot1 <- plot_ly(newmousedata, x = ~obs, y = ~yij, type = 'scatter', mode = 'lines', linetype = ~tx, color = I('black'))
+plot1
+
+#line and error setup
+data_mean <- ddply(newmousedata, c("tx", "obs"), summarise, length = mean(yij))
+data_sd <- ddply(newmousedata, c("tx", "obs"), summarise, length = sd(yij))
+plotlydata <- data.frame(data_mean, data_sd$length)
+plotlydata <- rename(plotlydata, c("data_sd.length" = "sd"))
+
+#mean and sd
+plot2 <- plot_ly(data = plotlydata[which(plotlydata$tx == 'A'),], x = ~obs, y = ~length, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = sd, color = '#000000')) %>% add_trace(data = plotlydata[which(plotlydata$tx == 'B'),], name = 'B')
+plot2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
