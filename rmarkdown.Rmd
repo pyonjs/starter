@@ -1,0 +1,87 @@
+---
+title: "Diet Treatments to Standard Lab Mice"
+output: html_notebook
+---
+
+This is a practice experiment and data analysis using a simulated dataset of 10 standard lab mice. In this experiemnt, we observe the changes in mice weight between a control and a treatment of a change in diet for decrease in mass. 
+
+In order to find the standard weight of lab mice, we used information from [The Jackson Laboratory](https://www.jax.org/jax-mice-and-services/strain-data-sheet-pages/body-weight-chart-000664). Since the information here shows ranges of mice weights depending on age and gender, we chose the weight of males at 6weeks of age. This specific mice has an average weight of 21.1g with a standard deviation of 1.5. In this case, we assume that mice weight has a normal distribution. 
+
+In order to simulate the data, we used the mixed effects model for each of the treatments. For this data, we wish to have the dietary treatment to have a linear decrease in weight by 3. This decrease, along with the mean and standard deviation of the mice, helps us simulate the data we need. In order to keep that data simple and true, the random effects of both models are kept the same, with only the movement of the treatment group decreasing.
+
+The following two datasets are of the control group (dat1) and the treatment group (dat2), separately simulated.
+
+```{r}
+dat1
+```
+
+```{r}
+dat2
+```
+
+
+By combining the two separate datasets and adding columns for easier data observation, we produced a simulated dataset including both control and treatment groups. 
+
+```{r}
+newmousedata
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
