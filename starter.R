@@ -15,7 +15,7 @@ library(nlme)
 set.seed(615)
 n <- 5
 beta01 <- 21.1
-beta11 <- 0.01
+beta11 <- 0.00
 
 ar.val <- .3
 
@@ -109,6 +109,7 @@ table <- aggregate( yij ~ trial, FUN=function(x) c(mn=mean(x), sd=sd(x)), data=n
 library(ggplot2)
 library(plotly)
 library(rmarkdown)
+library(plyr)
 
 #ggplot
 graph1 <- ggplot(data = newmousedata, aes(x = obs, y = yij, group = mousenumber))
