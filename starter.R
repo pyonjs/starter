@@ -136,9 +136,24 @@ plotlydata <- rename(plotlydata, c("data_sd.length" = "sd"))
 plot2 <- plot_ly(data = plotlydata[which(plotlydata$tx == 'A'),], x = ~obs, y = ~length, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = sd, color = '#000000')) %>% add_trace(data = plotlydata[which(plotlydata$tx == 'B'),], name = 'B')
 plot2
 
+####################################################################################################################################################################################################################################
 
+#analysis
 
+newmousedata$id <- factor(newmousedata$id, ordered = FALSE)
+newmousedata$obs <- factor(newmousedata$obs, ordered = FALSE)
+newmousedata$tx <- factor(newmousedata$tx, ordered = FALSE)
+newmousedata$mousenumber <- factor(newmousedata$mousenumber, ordered = FALSE)
+newmousedata$trial <- factor(newmousedata$trial, ordered = FALSE)
 
+tempanova1 <- aov(yij ~ trial + tx, data=newmousedata)
+TukeyHSD(tempanova1, conf.level = 0.95)
+
+plotlydata$obs <- factor(plotlydata$obs, ordered = FALSE)
+plotlydata$tx <- factor(plotlydata$tx, ordered = FALSE)
+
+tempanova2 <- aov(length ~ obs + tx, data=plotlydata)
+TukeyHSD(tempanova2, conf.level = 0.95)
 
 
 
