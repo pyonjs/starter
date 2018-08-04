@@ -93,16 +93,19 @@ graph1 <- ggplot(data = newmousedata, aes(x = obs, y = yij, group = mousenumber)
 
 #spaghetti graph
 graph1 + geom_line(aes(colour=tx)) + geom_point(aes(colour=tx))
-#line graph
 
+#line graph
 graph2 <- ggplot(data = newmousedata, aes(x = obs, y = yij, group = tx))
 graph2 + stat_summary(fun.y = mean, geom = "point", aes(colour=tx)) + stat_summary(fun.y = mean, geom = "line", aes(colour=tx)) + stat_summary(fun.data = mean_cl_normal, geom = "errorbar", aes(colour=tx))
 
 ####################################################################################################################################################################################################################################
 
-#table of averages and sd
+library(Rmisc)
+
+#table of averages and sd and se
 #1-4 are control, 5-8 are tx
-table <- aggregate( yij ~ trial, FUN=function(x) c(mn=mean(x), sd=sd(x)), data=newmousedata)
+
+table <- summarySE(newmousedata, measurevar="yij", groupvars=c("tx","obs"))
 
 ####################################################################################################################################################################################################################################
 
@@ -110,6 +113,7 @@ library(ggplot2)
 library(plotly)
 library(rmarkdown)
 library(plyr)
+library(Hmisc)
 
 #ggplot
 graph1 <- ggplot(data = newmousedata, aes(x = obs, y = yij, group = mousenumber))
@@ -121,24 +125,27 @@ graph1 + geom_line(aes(colour=tx)) + geom_point(aes(colour=tx)) + labs(x = "time
 graph2 <- ggplot(data = newmousedata, aes(x = obs, y = yij, group = tx))
 graph2 + stat_summary(fun.y = mean, geom = "point", aes(colour=tx)) + stat_summary(fun.y = mean, geom = "line", aes(colour=tx)) + stat_summary(fun.data = mean_cl_normal, geom = "errorbar", aes(colour=tx)) + labs(x = "time points") + labs(y = "weight")
 
+#new meana and error graph, using se
+graph3 <- ggplot(table, aes(x=obs, y=yij, color=tx))
+graph3 + geom_errorbar(aes(ymin = yij - se, ymax=yij + se), width=.2, size=0.7, position = position_dodge(0.1)) + geom_point(shape = 15, size = 3, position = position_dodge(0.1)) + theme_bw() + theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) + scale_color_manual(values = c("black", "blue")) + labs(x = "time points") + labs(y = "weight")
+
 #plotly
 #individual tx movement
 plot1 <- plot_ly(newmousedata, x = ~obs, y = ~yij, type = 'scatter', mode = 'lines', linetype = ~tx, color = I('black'))
 plot1
 
-#line and error setup
-data_mean <- ddply(newmousedata, c("tx", "obs"), summarise, length = mean(yij))
-data_sd <- ddply(newmousedata, c("tx", "obs"), summarise, length = sd(yij))
-plotlydata <- data.frame(data_mean, data_sd$length)
-plotlydata <- rename(plotlydata, c("data_sd.length" = "sd"))
-
 #mean and sd
-plot2 <- plot_ly(data = plotlydata[which(plotlydata$tx == 'A'),], x = ~obs, y = ~length, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = sd, color = '#000000')) %>% add_trace(data = plotlydata[which(plotlydata$tx == 'B'),], name = 'B')
+plot2 <- plot_ly(data = table[which(table$tx == 'A'),], x = ~obs, y = ~yij, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = sd, color = '#000000')) %>% add_trace(data = table[which(table$tx == 'B'),], name = 'B')
 plot2
+
+#mean and se
+plot3 <- plot_ly(data = table[which(table$tx == 'A'),], x = ~obs, y = ~yij, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = se, color = '#000000')) %>% add_trace(data = table[which(table$tx == 'B'),], name = 'B')
+plot3
 
 ####################################################################################################################################################################################################################################
 
 #analysis
+library(car)
 
 newmousedata$id <- factor(newmousedata$id, ordered = FALSE)
 newmousedata$obs <- factor(newmousedata$obs, ordered = FALSE)
@@ -149,46 +156,17 @@ newmousedata$trial <- factor(newmousedata$trial, ordered = FALSE)
 tempanova1 <- aov(yij ~ trial + tx, data=newmousedata)
 TukeyHSD(tempanova1, conf.level = 0.95)
 
-plotlydata$obs <- factor(plotlydata$obs, ordered = FALSE)
-plotlydata$tx <- factor(plotlydata$tx, ordered = FALSE)
+#pvalue of 1-5 is 0.9999133, 2-6 is 0.7851758, 3-7 is 0.0262065, 4-8 is 0.0771551
 
-tempanova2 <- aov(length ~ obs + tx, data=plotlydata)
+table$obs <- factor(table$obs, ordered = FALSE)
+table$tx <- factor(table$tx, ordered = FALSE)
+
+tempanova2 <- aov(length ~ obs + tx + obs:tx, data=table)
 TukeyHSD(tempanova2, conf.level = 0.95)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+model1 <- lm(yij ~ obs + tx + obs:tx, data = newmousedata)
+Anova(model1, type = "II")
+summary(model1)
 
 
 
