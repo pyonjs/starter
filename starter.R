@@ -142,6 +142,10 @@ plot2
 plot3 <- plot_ly(data = table[which(table$tx == 'A'),], x = ~obs, y = ~yij, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = se, color = '#000000')) %>% add_trace(data = table[which(table$tx == 'B'),], name = 'B')
 plot3
 
+#plot2 and plot3 are a problem at the moment. both are similar, except for the change from sd to se between plot2 and plot3,
+#but for some reason they are the same plot when error bars should be contrained in plot3. i will try to fix this but i have
+#no idea at the moment on how to fix this.
+
 ####################################################################################################################################################################################################################################
 
 #analysis
