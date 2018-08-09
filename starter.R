@@ -87,25 +87,23 @@ newmousedata
 
 ####################################################################################################################################################################################################################################
 
-library(ggplot2)
-library(Hmisc)
-graph1 <- ggplot(data = newmousedata, aes(x = obs, y = yij, group = mousenumber))
-
-#spaghetti graph
-graph1 + geom_line(aes(colour=tx)) + geom_point(aes(colour=tx))
-
-#line graph
-graph2 <- ggplot(data = newmousedata, aes(x = obs, y = yij, group = tx))
-graph2 + stat_summary(fun.y = mean, geom = "point", aes(colour=tx)) + stat_summary(fun.y = mean, geom = "line", aes(colour=tx)) + stat_summary(fun.data = mean_cl_normal, geom = "errorbar", aes(colour=tx))
-
-####################################################################################################################################################################################################################################
-
 library(Rmisc)
 
 #table of averages and sd and se
 #1-4 are control, 5-8 are tx
 
 table <- summarySE(newmousedata, measurevar="yij", groupvars=c("tx","obs"))
+
+####################################################################################################################################################################################################################################
+
+#additional cleanup
+newmousedata$id <- as.factor(newmousedata$id)
+newmousedata$obs <- as.factor(newmousedata$obs)
+newmousedata$tx <- as.factor(newmousedata$tx)
+newmousedata$mousenumber <- as.factor(newmousedata$mousenumber)
+newmousedata$trial <- as.factor(newmousedata$trial)
+table$obs <- as.factor(table$obs)
+table$tx <- as.factor(table$tx)
 
 ####################################################################################################################################################################################################################################
 
@@ -119,15 +117,68 @@ library(Hmisc)
 graph1 <- ggplot(data = newmousedata, aes(x = obs, y = yij, group = mousenumber))
 
 #individual movement
-graph1 + geom_line(aes(colour=tx)) + geom_point(aes(colour=tx)) + labs(x = "time points") + labs(y = "weight")
+graphy1 <- graph1 +
+  geom_line(aes(colour=tx)) +
+  geom_point(aes(colour=tx)) + theme_bw() +
+  theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
+  labs(x = "Time Points") + labs(y = "Weight (g)") +
+  ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
 
-#movement based on means, with sd
+#movement based on means, with sd (normal)
 graph2 <- ggplot(data = newmousedata, aes(x = obs, y = yij, group = tx))
-graph2 + stat_summary(fun.y = mean, geom = "point", aes(colour=tx)) + stat_summary(fun.y = mean, geom = "line", aes(colour=tx)) + stat_summary(fun.data = mean_cl_normal, geom = "errorbar", aes(colour=tx)) + labs(x = "time points") + labs(y = "weight")
 
-#new meana and error graph, using se
-graph3 <- ggplot(table, aes(x=obs, y=yij, color=tx))
-graph3 + geom_errorbar(aes(ymin = yij - se, ymax=yij + se), width=.2, size=0.7, position = position_dodge(0.1)) + geom_point(shape = 15, size = 3, position = position_dodge(0.1)) + theme_bw() + theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) + scale_color_manual(values = c("black", "blue")) + labs(x = "time points") + labs(y = "weight")
+#cl normal
+graphy2 <- graph2 +
+  stat_summary(fun.y = mean, geom = "point", aes(colour=tx)) +
+  stat_summary(fun.y = mean, geom = "line", aes(colour=tx)) +
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", aes(color=tx)) +
+  theme_bw() +
+  theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
+  labs(x = "Time Points") + labs(y = "Weight (g)") +
+  ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
+
+#standard error
+graphy3 <- graph2 +
+  stat_summary(fun.y = mean, geom = "point", aes(colour=tx)) +
+  stat_summary(fun.y = mean, geom = "line", aes(colour=tx)) +
+  stat_summary(fun.data = mean_se, geom = "errorbar", aes(color=tx)) +
+  theme_bw() +
+  theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
+  labs(x = "Time Points") + labs(y = "Weight (g)") +
+  ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
+
+#new meana and error graph, using sd and se and ci
+graph3 <- ggplot(table, aes(x=obs, y=yij, group = tx, color=tx))
+
+#standard deviation
+graphy4 <- graph3 +
+  geom_errorbar(aes(ymin = yij - sd, ymax=yij + sd), width=.2, size=0.7, position = position_dodge(0.1)) +
+  geom_point(position = position_dodge(0.1)) +
+  geom_line() +
+  theme_bw() +
+  theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
+  labs(x = "Time Points") + labs(y = "Weight (g)") +
+  ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
+
+#standard error
+graphy5 <- graph3 +
+  geom_errorbar(aes(ymin = yij - se, ymax=yij + se), width=.2, size=0.7, position = position_dodge(0.1)) +
+  geom_point(position = position_dodge(0.1)) +
+  geom_line() +
+  theme_bw() +
+  theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
+  labs(x = "Time Points") + labs(y = "Weight (g)") +
+  ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
+
+#confidence intervals
+graphy6 <- graph3 +
+  geom_errorbar(aes(ymin = yij - ci, ymax=yij + ci), width=.2, size=0.7, position = position_dodge(0.1)) +
+  geom_point(position = position_dodge(0.1)) +
+  geom_line() +
+  theme_bw() +
+  theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
+  labs(x = "Time Points") + labs(y = "Weight (g)") +
+  ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
 
 #plotly
 #individual tx movement
@@ -146,16 +197,11 @@ plot3
 #but for some reason they are the same plot when error bars should be contrained in plot3. i will try to fix this but i have
 #no idea at the moment on how to fix this.
 
+
 ####################################################################################################################################################################################################################################
 
 #analysis
 library(car)
-
-newmousedata$id <- factor(newmousedata$id, ordered = FALSE)
-newmousedata$obs <- factor(newmousedata$obs, ordered = FALSE)
-newmousedata$tx <- factor(newmousedata$tx, ordered = FALSE)
-newmousedata$mousenumber <- factor(newmousedata$mousenumber, ordered = FALSE)
-newmousedata$trial <- factor(newmousedata$trial, ordered = FALSE)
 
 tempanova1 <- aov(yij ~ trial + tx, data=newmousedata)
 TukeyHSD(tempanova1, conf.level = 0.95)
@@ -165,7 +211,7 @@ TukeyHSD(tempanova1, conf.level = 0.95)
 table$obs <- factor(table$obs, ordered = FALSE)
 table$tx <- factor(table$tx, ordered = FALSE)
 
-tempanova2 <- aov(length ~ obs + tx + obs:tx, data=table)
+tempanova2 <- aov(yij ~ obs + tx + obs:tx, data=table)
 TukeyHSD(tempanova2, conf.level = 0.95)
 
 model1 <- lm(yij ~ obs + tx + obs:tx, data = newmousedata)

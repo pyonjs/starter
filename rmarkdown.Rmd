@@ -20,19 +20,25 @@ dat2
 ```
 
 
-By combining the two separate datasets and adding columns for easier data observation, we produced a simulated dataset including both control and treatment groups. 
+By combining the two separate datasets and adding columns for easier data observation, we produced a simulated dataset including both control and treatment groups. In the table, yij is the weight of each individual mice (mousenumber) at each timepoint (obs).
 
 ```{r}
 newmousedata
 ```
 
+In the next table, we calculate the means (yij), standard deviation (sd), and standard error (se) of the weight of all the mice at each timepoint (obs) from each treatment group (tx).
 
+```{r}
+table
+```
 
+The first graph shows the weights of individual mice during the experiment, with color differntiating treatment groups. We can see that the individuals from treatment A (control) are fairly spread out, with movement of weight having no noticable direction. However, in treatment B (treatment), we can see a visible downward direction in the movement of the lines.
 
+```{r}
+graphy1
+```
 
-
-
-
+The next couple of graphs are produced to see the movement of the means of the weights of mice, with error bars shown for variance from the mean.
 
 
 
