@@ -147,7 +147,7 @@ graphy3 <- graph2 +
   labs(x = "Time Points") + labs(y = "Weight (g)") +
   ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
 
-#new meana and error graph, using sd and se and ci
+#new mean and error graph, using sd and se and ci
 graph3 <- ggplot(table, aes(x=obs, y=yij, group = tx, color=tx))
 
 #standard deviation
@@ -168,7 +168,7 @@ graphy5 <- graph3 +
   theme_bw() +
   theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
   labs(x = "Time Points") + labs(y = "Weight (g)") +
-  ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
+  ggtitle("Changes in Mean Weights of Mice from Control and Treatment Groups") 
 
 #confidence intervals
 graphy6 <- graph3 +
@@ -202,18 +202,20 @@ plot3
 
 #analysis
 library(car)
+library(MASS)
 
-tempanova1 <- aov(yij ~ trial + tx, data=newmousedata)
-TukeyHSD(tempanova1, conf.level = 0.95)
+#check for normal
+normalcheckdata <- subset(newmousedata, tx=="A")
+model <- lm(yij ~ obs, data = normalcheckdata)
+qqPlot(model, distribution="norm", main="QQ Plot")
 
-#pvalue of 1-5 is 0.9999133, 2-6 is 0.7851758, 3-7 is 0.0262065, 4-8 is 0.0771551
-
-table$obs <- factor(table$obs, ordered = FALSE)
-table$tx <- factor(table$tx, ordered = FALSE)
-
-tempanova2 <- aov(yij ~ obs + tx + obs:tx, data=table)
+#t-test
+tempanova1 <- aov(yij ~ obs:tx, data = newmousedata)
 TukeyHSD(tempanova2, conf.level = 0.95)
 
+#pvalue of 1A-1B is 0.9996832, 2A-2B is 0.9924810, 3A-3B is 0.1371564, and 4A-4b is 0.0352388
+
+#
 model1 <- lm(yij ~ obs + tx + obs:tx, data = newmousedata)
 Anova(model1, type = "II")
 summary(model1)
@@ -226,3 +228,25 @@ summary(model1)
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#save
+save.image("C:/Users/PyonJ/OneDrive/Documents/starter/starter.RData")

@@ -38,8 +38,23 @@ The first graph shows the weights of individual mice during the experiment, with
 graphy1
 ```
 
-The next couple of graphs are produced to see the movement of the means of the weights of mice, with error bars shown for variance from the mean.
+The next graph is made by calculating the mean and the standard error of means of each treatment group at each timepoint. The graph's error bars shows us the standard error of means of each treatment group at each timepoint. We can see that at the first timepoint, both the mean and the error bars are fairly similar, with overlap of the bars occuring. As the experiment goes on, the means visually drift apart and the error bars become separated.
 
+```{r}
+graphy5
+```
+
+Before analysis, we checked whether the treatment A group (control) is truely normal. In order to do so, we used linear regression on the data pertaining only to treatment A. By doing so, we developed q-q plots, which is the following graph. Looking at the graph, we are able to see that, other than 2 outliers, the distribution of the points of treatment A is normal, which is what we assumed when simulating the data.
+
+```{r}
+qqPlot(model, distribution="norm", main="QQ Plot")
+```
+
+We did a simple t-test analysis. In doing so, we observe the p-values of those between complimentary treatment timepoints: 1A-1B, 2A-2B, 3A-3B, and 4A-4b. 1A-1B pertains to the first timepoint, 2A-2B to the second timepoint, and so on. By looking at these, we see that the p-value of 1A-1B is 0.9996832, 2A-2B is 0.9924810, 3A-3B is 0.1371564, and 4A-4b is 0.0352388. This tells us that at the first timepoint, the samples are the same. However, as time goes on, the differences between the two groups become more significant.
+
+```{r}
+TukeyHSD(tempanova1, conf.level = 0.95)
+```
 
 
 
