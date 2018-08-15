@@ -9,101 +9,85 @@
 
 ####################################################################################################################################################################################################################################
 
-#data made for control
+#data generation of mice weights, with normal error. Version2.0
+
 library(MASS)
 library(nlme)
-set.seed(615)
-n <- 5
-beta01 <- 21.1
-beta11 <- 0.00
 
-ar.val <- .3
+#generation of control treatment
 
-sigma <- 1.5
-tau0  <- 0.5
-tau1  <- 0.5
-tau01 <- 0.5
-m <- 5
+ta0 <- rnorm(5, mean = 21.1, sd = 1.5)
+ta1 <- ta0 + rexp(5, 5)
+ta2 <- ta1 + rexp(5, 5)
+ta3 <- ta2 + rexp(5, 5)
+data1 <- data.frame(ta0, ta1, ta2, ta3)
+data1 <- stack(data1)
+txa <- rep("A",length(1:5))
+data1 <- data.frame(data1, txa)
 
-p <- round(runif(n,4,m))
+data1$id <- rep(c(1:5))
 
-obs <- unlist(sapply(p, function(x) c(1, sort(sample(2:m, x-1, replace=FALSE)))))
+data1$time <- ifelse(data1$ind == "ta0", 0,
+                     ifelse(data1$ind == "ta1", 1,
+                            ifelse(data1$ind == "ta2", 2,
+                                   ifelse(data1$ind == "ta3", 3, F))))
 
-dat1 <- data.frame(id=rep(1:n, times=p), obs=obs)
+names(data1)[names(data1) == "values"] <- "weight"
+names(data1)[names(data1) == "txa"] <- "treatment"
 
-mu  <- c(0,0)
-S   <- matrix(c(1, tau01, tau01, 1), nrow=2)
-tau <- c(tau0, tau1)
-S   <- diag(tau) %*% S %*% diag(tau)
-U   <- mvrnorm(n, mu=mu, Sigma=S)
+data1$values <- data1$wjt
+data1$txa <- data1$trt
 
-dat1$eij <- unlist(sapply(p, function(x) arima.sim(model=list(ar=ar.val), n=x) * sqrt(1-ar.val^2) * sigma))
-dat1$yij <- (beta01 + rep(U[,1], times=p)) + (beta11 + rep(U[,2], times=p)) * log(dat1$obs) + dat1$eij
+#generation of weight loss treatment
 
-dat1 <- groupedData(yij ~ obs | id, data=dat1)
+tb0 <- rnorm(5, mean = 21.1, sd = 1.5)
+tb1 <- tb0 - 2 + rnorm(5, mean = 0, sd = 1)
+tb2 <- tb1 - 2 + rnorm(5, mean = 0, sd = 1)
+tb3 <- tb2 - 2 + rnorm(5, mean = 0, sd = 1)
+txb <- rep("B",length(1:5))
+data2 <- data.frame(tb0, tb1, tb2, tb3)
+data2 <- stack(data2)
+txb <- rep("B",length(1:5))
+data2 <- data.frame(data2, txb)
 
-####################################################################################################################################################################################################################################
+data2$id <- rep(c(6:10))
 
-#data made for tx
-set.seed(327)
-n <- 5
-beta02 <- 21.1
-beta12 <- -3
+data2$time <- ifelse(data2$ind == "tb0", 0,
+                     ifelse(data2$ind == "tb1", 1,
+                            ifelse(data2$ind == "tb2", 2,
+                                   ifelse(data2$ind == "tb3", 3, F))))
 
-ar.val <- .3
+names(data2)[names(data2) == "values"] <- "weight"
+names(data2)[names(data2) == "txb"] <- "treatment"
 
-sigma <- 1.5
-tau0  <- 0.5
-tau1  <- 0.5
-tau01 <- 0.5
-m <- 5
+data2$values <- data2$wjt
+data2$txb <- data2$trt
 
-p <- round(runif(n,4,m))
-
-obs <- unlist(sapply(p, function(x) c(1, sort(sample(2:m, x-1, replace=FALSE)))))
-
-dat2 <- data.frame(id=rep(1:n, times=p), obs=obs)
-
-mu  <- c(0,0)
-S   <- matrix(c(1, tau01, tau01, 1), nrow=2)
-tau <- c(tau0, tau1)
-S   <- diag(tau) %*% S %*% diag(tau)
-U   <- mvrnorm(n, mu=mu, Sigma=S)
-
-dat2$eij <- unlist(sapply(p, function(x) arima.sim(model=list(ar=ar.val), n=x) * sqrt(1-ar.val^2) * sigma))
-dat2$yij <- (beta02 + rep(U[,1], times=p)) + (beta12 + rep(U[,2], times=p)) * log(dat2$obs) + dat2$eij
-
-dat2 <- groupedData(yij ~ obs | id, data=dat2)
-
-####################################################################################################################################################################################################################################
-
-#additional columns for dataframe
-mousedata <- rbind(dat1, dat2)
-mousedata$tx <- c("A", "A", "A","A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B", "B")
-mousedata$mousenumber <- c("1", "1", "1", "1", "1","2", "2", "2", "2", "2", "3", "3", "3", "3", "4", "4", "4", "4", "5", "5", "5", "5", "6", "6", "6", "6", "6", "7", "7", "7", "7", "8", "8", "8", "8", "8", "9", "9", "9", "9", "9", "10", "10", "10", "10", "10")
-newmousedata <- mousedata[ mousedata$obs != "5", , drop=FALSE]
-newmousedata$trial <- c("1", "2", "3", "4", "1","2", "3", "4", "1", "2", "3", "1", "3", "4", "1", "2", "3", "4", "5", "6", "7", "8", "5", "6", "7", "5", "6", "7", "8", "5", "6", "7", "8", "5", "6", "7", "8")
-newmousedata
+mousedata <- rbind(data1, data2)
+mousedata$ind <- NULL
 
 ####################################################################################################################################################################################################################################
 
 library(Rmisc)
 
-#table of averages and sd and se
-#1-4 are control, 5-8 are tx
-
-table <- summarySE(newmousedata, measurevar="yij", groupvars=c("tx","obs"))
+table <- summarySE(mousedata, measurevar="weight", groupvars=c("treatment","time"))
 
 ####################################################################################################################################################################################################################################
 
 #additional cleanup
-newmousedata$id <- as.factor(newmousedata$id)
-newmousedata$obs <- as.factor(newmousedata$obs)
-newmousedata$tx <- as.factor(newmousedata$tx)
-newmousedata$mousenumber <- as.factor(newmousedata$mousenumber)
-newmousedata$trial <- as.factor(newmousedata$trial)
-table$obs <- as.factor(table$obs)
-table$tx <- as.factor(table$tx)
+
+mousedata$treatment <- as.factor(mousedata$treatment)
+mousedata$id <- as.factor(mousedata$id)
+table$treatment <- as.factor(table$treatment)
+
+####################################################################################################################################################################################################################################
+
+rexp(100,50)
+
+
+
+
+####################################################################################################################################################################################################################################
 
 ####################################################################################################################################################################################################################################
 
@@ -114,83 +98,83 @@ library(plyr)
 library(Hmisc)
 
 #ggplot
-graph1 <- ggplot(data = newmousedata, aes(x = obs, y = yij, group = mousenumber))
+graph1 <- ggplot(data = mousedata, aes(x = time, y = weight, group = id))
 
 #individual movement
 graphy1 <- graph1 +
-  geom_line(aes(colour=tx)) +
-  geom_point(aes(colour=tx)) + theme_bw() +
+  geom_line(aes(colour=treatment)) +
+  geom_point(aes(colour=treatment)) + theme_bw() +
   theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
   labs(x = "Time Points") + labs(y = "Weight (g)") +
   ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
 
 #movement based on means, with sd (normal)
-graph2 <- ggplot(data = newmousedata, aes(x = obs, y = yij, group = tx))
+graph2 <- ggplot(data = mousedata, aes(x = time, y = weight, group = treatment))
 
 #cl normal
 graphy2 <- graph2 +
-  stat_summary(fun.y = mean, geom = "point", aes(colour=tx)) +
-  stat_summary(fun.y = mean, geom = "line", aes(colour=tx)) +
+  stat_summary(fun.y = mean, geom = "point", aes(colour=treatment)) +
+  stat_summary(fun.y = mean, geom = "line", aes(colour=treatment)) +
   stat_summary(fun.data = mean_cl_normal, geom = "errorbar", aes(color=tx)) +
   theme_bw() +
   theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
-  labs(x = "Time Points") + labs(y = "Weight (g)") +
+  labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") +
   ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
 
 #standard error
 graphy3 <- graph2 +
-  stat_summary(fun.y = mean, geom = "point", aes(colour=tx)) +
-  stat_summary(fun.y = mean, geom = "line", aes(colour=tx)) +
-  stat_summary(fun.data = mean_se, geom = "errorbar", aes(color=tx)) +
+  stat_summary(fun.y = mean, geom = "point", aes(colour=treatment)) +
+  stat_summary(fun.y = mean, geom = "line", aes(colour=treatment)) +
+  stat_summary(fun.data = mean_se, geom = "errorbar", aes(color=treatment)) +
   theme_bw() +
   theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
-  labs(x = "Time Points") + labs(y = "Weight (g)") +
+  labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") +
   ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
 
 #new mean and error graph, using sd and se and ci
-graph3 <- ggplot(table, aes(x=obs, y=yij, group = tx, color=tx))
+graph3 <- ggplot(table, aes(x=time, y=weight, group = treatment, color=treatment))
 
 #standard deviation
 graphy4 <- graph3 +
-  geom_errorbar(aes(ymin = yij - sd, ymax=yij + sd), width=.2, size=0.7, position = position_dodge(0.1)) +
+  geom_errorbar(aes(ymin = weight - sd, ymax = weight + sd), width=.2, size=0.7, position = position_dodge(0.1)) +
   geom_point(position = position_dodge(0.1)) +
   geom_line() +
   theme_bw() +
   theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
-  labs(x = "Time Points") + labs(y = "Weight (g)") +
+  labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") +
   ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
 
 #standard error
 graphy5 <- graph3 +
-  geom_errorbar(aes(ymin = yij - se, ymax=yij + se), width=.2, size=0.7, position = position_dodge(0.1)) +
+  geom_errorbar(aes(ymin = weight - se, ymax = weight + se), width=.2, size=0.7, position = position_dodge(0.1)) +
   geom_point(position = position_dodge(0.1)) +
   geom_line() +
   theme_bw() +
   theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
-  labs(x = "Time Points") + labs(y = "Weight (g)") +
+  labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") +
   ggtitle("Changes in Mean Weights of Mice from Control and Treatment Groups") 
 
 #confidence intervals
 graphy6 <- graph3 +
-  geom_errorbar(aes(ymin = yij - ci, ymax=yij + ci), width=.2, size=0.7, position = position_dodge(0.1)) +
+  geom_errorbar(aes(ymin = weight - ci, ymax = weight + ci), width=.2, size=0.7, position = position_dodge(0.1)) +
   geom_point(position = position_dodge(0.1)) +
   geom_line() +
   theme_bw() +
   theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
-  labs(x = "Time Points") + labs(y = "Weight (g)") +
+  labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") +
   ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
 
 #plotly
 #individual tx movement
-plot1 <- plot_ly(newmousedata, x = ~obs, y = ~yij, type = 'scatter', mode = 'lines', linetype = ~tx, color = I('black'))
+plot1 <- plot_ly(mousedata, x = ~time, y = ~weight, type = 'scatter', mode = 'lines', linetype = ~treatment, color = I('black'))
 plot1
 
 #mean and sd
-plot2 <- plot_ly(data = table[which(table$tx == 'A'),], x = ~obs, y = ~yij, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = sd, color = '#000000')) %>% add_trace(data = table[which(table$tx == 'B'),], name = 'B')
+plot2 <- plot_ly(data = table[which(table$treatment == 'A'),], x = ~time, y = ~weight, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = sd, color = '#000000')) %>% add_trace(data = table[which(table$treatment == 'B'),], name = 'B')
 plot2
 
 #mean and se
-plot3 <- plot_ly(data = table[which(table$tx == 'A'),], x = ~obs, y = ~yij, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = se, color = '#000000')) %>% add_trace(data = table[which(table$tx == 'B'),], name = 'B')
+plot3 <- plot_ly(data = table[which(table$treatment == 'A'),], x = ~time, y = ~weight, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = se, color = '#000000')) %>% add_trace(data = table[which(table$treatment == 'B'),], name = 'B')
 plot3
 
 #plot2 and plot3 are a problem at the moment. both are similar, except for the change from sd to se between plot2 and plot3,
