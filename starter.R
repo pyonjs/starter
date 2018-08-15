@@ -1,4 +1,4 @@
-#1
+
 #produce data:
 #######animal id (10) 5 in each treatments
 #######treatments (A is control, B is treatment of a loss of weight by 30% linear relation)
@@ -17,9 +17,9 @@ library(nlme)
 #generation of control treatment
 
 ta0 <- rnorm(5, mean = 21.1, sd = 1.5)
-ta1 <- ta0 + rexp(5, 5)
-ta2 <- ta1 + rexp(5, 5)
-ta3 <- ta2 + rexp(5, 5)
+ta1 <- ta0 + 1.8 + rnorm(1, mean = 0, sd = 1)
+ta2 <- ta1 + 1.1 + rnorm(1, mean = 0, sd = 1)
+ta3 <- ta2 + 1.0 + rnorm(1, mean = 0, sd = 1)
 data1 <- data.frame(ta0, ta1, ta2, ta3)
 data1 <- stack(data1)
 txa <- rep("A",length(1:5))
@@ -41,9 +41,9 @@ data1$txa <- data1$trt
 #generation of weight loss treatment
 
 tb0 <- rnorm(5, mean = 21.1, sd = 1.5)
-tb1 <- tb0 - 2 + rnorm(5, mean = 0, sd = 1)
-tb2 <- tb1 - 2 + rnorm(5, mean = 0, sd = 1)
-tb3 <- tb2 - 2 + rnorm(5, mean = 0, sd = 1)
+tb1 <- tb0 - 2 + 1.8 + rnorm(1, mean = 0, sd = 1)
+tb2 <- tb1 - 2 + 1.8 + rnorm(1, mean = 0, sd = 1)
+tb3 <- tb2 - 2 + 1.8 + rnorm(1, mean = 0, sd = 1)
 txb <- rep("B",length(1:5))
 data2 <- data.frame(tb0, tb1, tb2, tb3)
 data2 <- stack(data2)
@@ -66,6 +66,11 @@ data2$txb <- data2$trt
 mousedata <- rbind(data1, data2)
 mousedata$ind <- NULL
 
+# At the moment, I am not sure how to fix how the data is generated. The data seems to be generated
+#with the rnorm() part having a set seed for every initiation of the function. The intention was 
+#for the rnorm part to produce a random number each time the function is applied to each individual
+#mouse. It is difficult to find the proper coding at the moment.
+
 ####################################################################################################################################################################################################################################
 
 library(Rmisc)
@@ -81,11 +86,6 @@ mousedata$id <- as.factor(mousedata$id)
 table$treatment <- as.factor(table$treatment)
 
 ####################################################################################################################################################################################################################################
-
-rexp(100,50)
-
-
-
 
 ####################################################################################################################################################################################################################################
 
@@ -105,7 +105,7 @@ graphy1 <- graph1 +
   geom_line(aes(colour=treatment)) +
   geom_point(aes(colour=treatment)) + theme_bw() +
   theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
-  labs(x = "Time Points") + labs(y = "Weight (g)") +
+  labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") +
   ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
 
 #movement based on means, with sd (normal)
