@@ -5,25 +5,28 @@ output: html_notebook
 
 This is a practice experiment and data analysis using a simulated dataset of 10 standard lab mice. In this experiemnt, we observe the changes in mice weight between a control and a treatment of a change in diet for decrease in mass. 
 
-In order to find the standard weight of lab mice, we used information from [The Jackson Laboratory](https://www.jax.org/jax-mice-and-services/strain-data-sheet-pages/body-weight-chart-000664). Since the information here shows ranges of mice weights depending on age and gender, we chose the weight of males at 6weeks of age. This specific mice has an average weight of 21.1g with a standard deviation of 1.5. In this case, we assume that mice weight has a normal distribution. 
+In order to find the standard weight of lab mice, we used information from [The Jackson Laboratory](https://www.jax.org/jax-mice-and-services/strain-data-sheet-pages/body-weight-chart-000664). Since the information here shows ranges of mice weights depending on age and gender, we chose the weight of males at 6weeks of age. This specific mice has an average weight of 21.1g with a standard deviation of 1.5. We set the time between examination of the mice to be one week. In this case, we assume that mice weight has a normal distribution. 
 
-In order to simulate the data, we used the mixed effects model for each of the treatments. For this data, we wish to have the dietary treatment to have a linear decrease in weight by 3g. This decrease, along with the mean and standard deviation of the mice, helps us simulate the data we need. In order to keep that data simple and true, the random effects of both models are kept the same, with only the movement of the treatment group decreasing.
+In order to simulate the data, we separated the dataset by treatment groups, since they both have separate trends, and merge the data together into the full data. We start first by producing mouse weight data for the first timepoint, basing this sample in a normal distribution and to the information on mice weights we have. Then for the second time point, we use each weight point from the first time event and use a formula made based on the mice information we have to produce the point for each mouse. we do this repeatedly until we receive 4 timepoints for 5 mice for each treatment group dataset.
 
-The following two datasets are of the control group (dat1) and the treatment group (dat2), separately simulated.
+The following two datasets are of the control group (data1) and the treatment group (data2), separately simulated. In both datasets, time represents the observation time, with 0 being the start of the experiment, 1 being the first week into the experiment, and so on. id represents each individual mouse. weight is the weight of the mouse in grams, and treatment is the treatment group each mouse is in, with A being the control and B being the treatment.
 
 ```{r}
-dat1
+data1
 ```
 
 ```{r}
-dat2
+data2
 ```
+
+
+
 
 
 By combining the two separate datasets and adding columns for easier data observation, we produced a simulated dataset including both control and treatment groups. In the table, yij is the weight of each individual mice (mousenumber) at each timepoint (obs).
 
 ```{r}
-newmousedata
+mousedata
 ```
 
 In the next table, we calculate the means (yij), standard deviation (sd), and standard error (se) of the weight of all the mice at each timepoint (obs) from each treatment group (tx).
