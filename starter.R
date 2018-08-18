@@ -75,7 +75,7 @@ mousedata$ind <- NULL
 
 library(Rmisc)
 
-table <- summarySE(mousedata, measurevar="weight", groupvars=c("treatment","time"))
+table <- summarySE(mousedata, measurevar="wjt", groupvars=c("trt","time"))
 
 ####################################################################################################################################################################################################################################
 
@@ -98,12 +98,12 @@ library(plyr)
 library(Hmisc)
 
 #ggplot
-graph1 <- ggplot(data = mousedata, aes(x = time, y = weight, group = id))
+graph1 <- ggplot(data = mousedata, aes(x = time, y = wjt, group = id))
 
 #individual movement
 graphy1 <- graph1 +
-  geom_line(aes(colour=treatment)) +
-  geom_point(aes(colour=treatment)) + theme_bw() +
+  geom_line(aes(colour=trt)) +
+  geom_point(aes(colour=trt)) + theme_bw() +
   theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
   labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") +
   ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
