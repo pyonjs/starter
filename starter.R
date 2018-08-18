@@ -189,8 +189,8 @@ library(car)
 library(MASS)
 
 #check for normal
-normalcheckdata <- subset(newmousedata, tx=="A")
-model <- lm(yij ~ obs, data = normalcheckdata)
+normalcheckdata <- subset(mousedata, treatment=="A")
+model <- lm(weight ~ time, data = normalcheckdata)
 qqPlot(model, distribution="norm", main="QQ Plot")
 
 #t-test
