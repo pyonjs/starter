@@ -19,10 +19,6 @@ data1
 data2
 ```
 
-
-
-
-
 By combining the two separate datasets and adding columns for easier data observation, we produced a simulated dataset including both control and treatment groups. In the table, yij is the weight of each individual mice (mousenumber) at each timepoint (obs).
 
 ```{r}
@@ -44,7 +40,7 @@ graphy1
 The next graph is made by calculating the mean and the standard error of means of each treatment group at each timepoint. The graph's error bars shows us the standard error of means of each treatment group at each timepoint. We can see that at the first timepoint, both the mean and the error bars are fairly similar, with overlap of the bars occuring. As the experiment goes on, the means visually drift apart and the error bars become separated.
 
 ```{r}
-graphy5
+graphy2
 ```
 
 Before analysis, we checked whether the treatment A group (control) is truely normal. In order to do so, we used linear regression on the data pertaining only to treatment A. By doing so, we developed q-q plots, which is the following graph. Looking at the graph, we are able to see that, other than 2 outliers, the distribution of the points of treatment A is normal, which is what we assumed when simulating the data.
