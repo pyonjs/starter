@@ -229,15 +229,15 @@ graphy4 <- graph3 +
 
 #plotly
 #individual tx movement
-plot1 <- plot_ly(mousedata, x = ~time, y = ~weight, type = 'scatter', mode = 'lines', linetype = ~treatment, color = I('black'))
+plot1 <- plot_ly(mousedata, x = ~time, y = ~wjt, type = 'scatter', mode = 'lines', linetype = ~id, color = I('black'))
 plot1
 
 #mean and sd
-plot2 <- plot_ly(data = table[which(table$treatment == 'A'),], x = ~time, y = ~weight, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = sd, color = '#000000')) %>% add_trace(data = table[which(table$treatment == 'B'),], name = 'B')
+plot2 <- plot_ly(data = table[which(table$trt == 'A'),], x = ~time, y = ~wjt, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = sd, color = '#000000')) %>% add_trace(data = table[which(table$trt == 'B'),], name = 'B')
 plot2
 
 #mean and se
-plot3 <- plot_ly(data = table[which(table$treatment == 'A'),], x = ~time, y = ~weight, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = se, color = '#000000')) %>% add_trace(data = table[which(table$treatment == 'B'),], name = 'B')
+plot3 <- plot_ly(data = table[which(table$trt == 'A'),], x = ~time, y = ~wjt, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = se, color = '#000000')) %>% add_trace(data = table[which(table$trt == 'B'),], name = 'B')
 plot3
 
 #plot2 and plot3 are a problem at the moment. both are similar, except for the change from sd to se between plot2 and plot3,
@@ -251,18 +251,23 @@ library(car)
 library(MASS)
 library(lme4)
 
-#t-test
-tempanova1 <- aov(wjt ~ time + trt + time:trt, data = mousedata)
-TukeyHSD(tempanova1, conf.level = 0.95)
+#lme model for individual mice
+lmetest1 <- lmer(wjt ~ time + (time | id), data = mousedata)
 
-#pvalue of 1A-1B is 0.9996832, 2A-2B is 0.9924810, 3A-3B is 0.1371564, and 4A-4b is 0.0352388
+#sd of intercept and slope is 0.2517g and 1.7749g/week
+#beta of intercept and slope is 20.665070g and -0.009812g/week
 
-#
-model1 <- lm(wjt ~ time + trt + time:trt, data = mousedata)
-Anova(model1, type = "II")
-summary(model1)
+#lme model for treatment groups
+lmetest2 <- lmer(wjt ~ time + (time | trt), data = mousedata)
 
+#sd of intercept and slope is 0.3351g and 2.2849g/week
+#beta of intercept and slope is 20.665070g and -0.009812g/week
 
+#lme model for individual mice with no correlation
+lmetest3 <- lmer(wjt ~ time + (time || id), data = mousedata)
+
+#sd of intercept and slope is 1.2553g and 1.7791g/week
+#beta of intercept and slope is 20.665070g and -0.009812g/week
 
 
 
