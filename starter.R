@@ -187,14 +187,14 @@ graphy1 <- graph1 +
 
 ####################################################################################################################################################################################################################################
 
-#movement based on means, with sd (normal)
+#movement based on means
 graph2 <- ggplot(data = mousedata, aes(x = time, y = wjt, group = trt))
 
 #confidence level normal
 graphy2 <- graph2 +
-  stat_summary(fun.y = mean, geom = "point", aes(colour=trt)) +
+  stat_summary(fun.y = mean, geom = "point", aes(colour=trt), position = position_dodge(0.1)) +
   stat_summary(fun.y = mean, geom = "line", aes(colour=trt)) +
-  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", aes(color=trt)) +
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", aes(color=trt), width = 0.2, position = position_dodge(0.1)) +
   theme_bw() +
   theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
   labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") + ylim(0, 30) +
@@ -202,9 +202,9 @@ graphy2 <- graph2 +
 
 #standard error
 graphy3 <- graph2 +
-  stat_summary(fun.y = mean, geom = "point", aes(colour=trt)) +
+  stat_summary(fun.y = mean, geom = "point", aes(colour=trt), position = position_dodge(0.1)) +
   stat_summary(fun.y = mean, geom = "line", aes(colour=trt)) +
-  stat_summary(fun.data = mean_se, geom = "errorbar", aes(color=trt)) +
+  stat_summary(fun.data = mean_se, geom = "errorbar", aes(color=trt), width = 0.2, position = position_dodge(0.1)) +
   theme_bw() +
   theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
   labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") + ylim(0, 30) +
@@ -212,29 +212,18 @@ graphy3 <- graph2 +
 
 ####################################################################################################################################################################################################################################
 
-#new mean and error graph, using sd and se and ci
+#new mean and error graph, using sd
 graph3 <- ggplot(table, aes(x=time, y=wjt, group = trt, color=trt))
 
 #standard deviation
 graphy4 <- graph3 +
-  geom_errorbar(aes(ymin = wjt - sd, ymax = wjt + sd), width=.2, size=0.7, position = position_dodge(0.1)) +
+  geom_errorbar(aes(ymin = wjt - sd, ymax = wjt + sd), width=0.2, size=0.7, position = position_dodge(0.1)) +
   geom_point(position = position_dodge(0.1)) +
   geom_line() +
   theme_bw() +
   theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
   labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") + ylim(0, 30) +
   ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
-
-#standard error
-graphy5 <- graph3 +
-  geom_errorbar(aes(ymin = wjt - se, ymax = wjt + se), width=.2, size=0.7, position = position_dodge(0.1)) +
-  geom_point(position = position_dodge(0.1)) +
-  geom_line() +
-  theme_bw() +
-  theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
-  labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") + ylim(0, 30) +
-  ggtitle("Changes in Mean Weights of Mice from Control and Treatment Groups") 
-
 
 ####################################################################################################################################################################################################################################
 
@@ -260,11 +249,7 @@ plot3
 #analysis
 library(car)
 library(MASS)
-
-#check for normal
-normalcheckdata <- subset(mousedata, trt=="A")
-model <- lm(wjt ~ time, data = normalcheckdata)
-qqPlot(model, distribution="norm", main="QQ Plot")
+library(lme4)
 
 #t-test
 tempanova1 <- aov(wjt ~ time + trt + time:trt, data = mousedata)
@@ -299,11 +284,7 @@ summary(model1)
 
 
 
-
-
-
-
-
+####################################################################################################################################################################################################################################
 
 #save
 save.image("C:/Users/PyonJ/OneDrive/Documents/starter/starter.RData")
