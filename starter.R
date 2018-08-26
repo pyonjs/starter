@@ -137,6 +137,8 @@ data2$time <- ifelse(data2$ind == "t0", 0,
 
 ####################################################################################################################################################################################################################################
 
+####################################################################################################################################################################################################################################
+
 #fixing column txa and txa to be same
 names(data1)[names(data1) == "txa"] <- "treatment"
 data1$txa <- data1$trt
@@ -156,8 +158,7 @@ names(mousedata)[names(mousedata) == "treatment"] <- "trt"
 #table of means and errors
 library(Rmisc)
 
-table <- summarySE(mousedata, measurevar="wjt", groupvars=c("trt","time"))
-table$ci <- NULL
+table <- summarySE(mousedata, measurevar="wjt", groupvars=c("trt","time"), conf.interval = 0.95)
 
 ####################################################################################################################################################################################################################################
 
@@ -226,23 +227,6 @@ graphy4 <- graph3 +
   ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
 
 ####################################################################################################################################################################################################################################
-
-#plotly
-#individual tx movement
-plot1 <- plot_ly(mousedata, x = ~time, y = ~wjt, type = 'scatter', mode = 'lines', linetype = ~id, color = I('black'))
-plot1
-
-#mean and sd
-plot2 <- plot_ly(data = table[which(table$trt == 'A'),], x = ~time, y = ~wjt, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = sd, color = '#000000')) %>% add_trace(data = table[which(table$trt == 'B'),], name = 'B')
-plot2
-
-#mean and se
-plot3 <- plot_ly(data = table[which(table$trt == 'A'),], x = ~time, y = ~wjt, type = 'scatter', mode = 'lines+markers', name = 'A', error_y = ~list(value = se, color = '#000000')) %>% add_trace(data = table[which(table$trt == 'B'),], name = 'B')
-plot3
-
-#plot2 and plot3 are a problem at the moment. both are similar, except for the change from sd to se between plot2 and plot3,
-#but for some reason they are the same plot when error bars should be contrained in plot3. i will try to fix this but i have
-#no idea at the moment on how to fix this.
 
 ####################################################################################################################################################################################################################################
 

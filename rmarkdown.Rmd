@@ -5,7 +5,7 @@ output: html_notebook
 
 This is a practice experiment and data analysis using a simulated dataset of 10 standard lab mice. In this experiemnt, we observe the changes in mice weight between a control and a treatment of a change in diet for decrease in mass. 
 
-In order to find the standard weight of lab mice, we used information from [The Jackson Laboratory](https://www.jax.org/jax-mice-and-services/strain-data-sheet-pages/body-weight-chart-000664). Since the information here shows ranges of mice weights depending on age and gender, we chose the weight of males at 6weeks of age. This specific mice has an average weight of 21.1g with a standard deviation of 1.5. We set the time between examination of the mice to be one week. In this case, we assume that mice weight has a normal distribution. 
+In order to find the standard weight qof lab mice, we used information from [The Jackson Laboratory](https://www.jax.org/jax-mice-and-services/strain-data-sheet-pages/body-weight-chart-000664). Since the information here shows ranges of mice weights depending on age and gender, we chose the weight of males at 6weeks of age. This specific mice has an average weight of 21.1g with a standard deviation of 1.5. We set the time between examination of the mice to be one week. In this case, we assume that mice weight has a normal distribution. 
 
 In order to simulate the data, we separated the dataset by treatment groups, since they both have separate trends, and merge the data together into the full data. We start first by producing mouse weight data for the first timepoint, basing this sample in a normal distribution and to the information on mice weights we have. Then for the second time point, we use each weight point from the first time event and use a formula made based on the mice information we have to produce the point for each mouse. we do this repeatedly until we receive 4 timepoints for 5 mice for each treatment group dataset.
 
@@ -43,15 +43,19 @@ The next graph is made by calculating the mean and the confidence levels of each
 graphy2
 ```
 
-
-We did a simple t-test analysis. In doing so, we observe the p-values of those between complimentary treatment timepoints: 1A-1B, 2A-2B, 3A-3B, and 4A-4b. 1A-1B pertains to the first timepoint, 2A-2B to the second timepoint, and so on. By looking at these, we see that the p-value of 1A-1B is 0.9996832, 2A-2B is 0.9924810, 3A-3B is 0.1371564, and 4A-4b is 0.0352388. This tells us that at the first timepoint, the samples are the same. However, as time goes on, the differences between the two groups become more significant.
+We tried to summarize the data into a linear regression. The first model is made by using all the variables known to have an effect and simplified with no interacting terms. Thus, we produce the linear formula y = 25.9057 - 0.9287x1 - 7.3703x2 + err, where x1 is time and x2 is identifier for treatment group. We can see that the p-values of each variables are less than 0.01 and are all significant.
 
 ```{r}
-TukeyHSD(tempanova1, conf.level = 0.95)
+mod1
 ```
 
+The next model is produced using the same simplified formulation of the previous model, with us adding an interaction term between time and treatment. You may notice that this model is similar to the formulation used to generated the simulated mouse data. In this model, the linear formula is y = 22.1853 + 0.5594x1 + 0.0706x2 - 2.97963x1x2 + err, with the same variables as the previous model. The p-values of the variables for time and treatment, with treatment being less so, to be greater than 0.05 in this case and are not significant to this model.
 
+```{r}
+mod2
+```
 
+The next model is produced using 
 
 
 
