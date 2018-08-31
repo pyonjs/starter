@@ -28,13 +28,13 @@ mousedata
 In the next table, we calculate the means (yij), standard deviation (sd), and standard error (se) of the weight of all the mice at each timepoint (obs) from each treatment group (tx).
 
 ```{r}
-table
+t1
 ```
 
 The first graph shows the weights of individual mice during the experiment, with color differntiating treatment groups. We can see that the individuals from treatment A (control) are fairly spread out, with movement of weight having no noticable direction. However, in treatment B (treatment), we can see a visible downward direction in the movement of the lines.
 
 ```{r}
-graphy1
+pl1
 ```
 
 The next graph is made by calculating the mean and the confidence levels of each treatment group at each timepoint. The graph's error bars shows us the standard error of means of each treatment group at each timepoint. We can see that at the first timepoint, both the mean and the error bars are fairly similar, with overlap of the bars occuring. As the experiment goes on, the means visually drift apart and the error bars become separated.
@@ -43,26 +43,17 @@ The next graph is made by calculating the mean and the confidence levels of each
 graphy2
 ```
 
-We tried to summarize the data into a linear regression. The first model is made by using all the variables known to have an effect and simplified with no interacting terms. Thus, we produce the linear formula y = 25.9057 - 0.9287x1 - 7.3703x2 + err, where x1 is time and x2 is identifier for treatment group. We can see that the p-values of each variables are less than 0.01 and are all significant.
+We tried to summarize the data into a linear regression. The first model is made by using all the variables known to have an effect and simplified with no interacting terms. Thus, we produce the linear formula y = 24.5834 - 0.4346x1 - 7.8618x2 + err, where x1 is time and x2 is identifier for treatment group. We can see that the p-values of each variables are less than 0.01 and are all significant.
 
 ```{r}
 mod1
 ```
 
-The next model is produced using the same simplified formulation of the previous model, with us adding an interaction term between time and treatment. You may notice that this model is similar to the formulation used to generated the simulated mouse data. In this model, the linear formula is y = 22.1853 + 0.5594x1 + 0.0706x2 - 2.97963x1x2 + err, with the same variables as the previous model. The p-values of the variables for time and treatment, with treatment being less so, to be greater than 0.05 in this case and are not significant to this model.
+The next model is produced using the same simplified formulation of the previous model, with us adding an interaction term between time and treatment. In this model, the linear formula is y = 22.1961 + 0.5203x1 - 3.0872x2 - 1.9098x1x2 + err, with the same variables as the previous model. The p-values of the variables for time to be greater than 0.05 in this case and is not significant to this model.
 
 ```{r}
 mod2
 ```
-
-The next model is produced using 
-
-
-
-
-
-
-
 
 
 
