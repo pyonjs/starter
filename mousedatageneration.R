@@ -7,12 +7,18 @@ wjt <- 21.1 - 2*time*trt - time*(trt-1) + rnorm(length(time), mean = 0, sd = 1.5
 trt <- factor(trt)
 id <- factor(id)
 
+# y = 21.1 + time - 3*trt*time + err
+
+
 ####################################################################################################################################################################################################################################
 
+library(Rmisc)
 library(ggplot2)
 
 dt1 <- data.frame(time, trt, wjt, id)
-ggplot(data = dt1, aes(x = time, y = wjt, group = id, color = trt)) + geom_line() + geom_point()
+t1 <- summarySE(dt1, measurevar="wjt", groupvars=c("trt","time"), conf.interval = 0.95)
+pl1 <- ggplot(data = dt1, aes(x = time, y = wjt, group = id, color = trt)) + geom_line() + geom_point()
+pl2 <- ggplot(data = t1, aes(x = time, y = wjt, group = trt, color = trt)) + geom_errorbar(aes(ymin = wjt - ci, ymax = wjt + ci)) + geom_line() + geom_point()
 
 ####################################################################################################################################################################################################################################
 
@@ -20,17 +26,20 @@ mod1 <- lm(wjt ~ time + trt, data = dt1)
 summary(mod1)
 plot(mod1)
 
+
 #y = 24.7170 - 0.5328x1 - 7.1457x2 + err
 
 mod2 <- lm(wjt ~ time + trt + time*trt, data = dt1)
 summary(mod2)
 plot(mod2)
 
-#y = 21.4069 + 0.7913x1 - 0.5255x2 - 2.6481x1x2 + err
+#y = 22.1961 + 0.5203x1 - 3.0872x2 - 1.9098x1x2 + err
 
 mod3 <- lm(wjt ~ time + time*trt, data = dt1)
 summary(mod3)
 plot(mod3)
+
+anova(mod1, mod2)
 
 ####################################################################################################################################################################################################################################
 
