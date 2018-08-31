@@ -64,7 +64,7 @@ data1 <- stack(ma)
 txa <- rep("A",length(1:5))
 data1 <- data.frame(data1, txa)
 
-data1$id <- rep(c(1:5))
+data1$identity <- rep(c(1:5))
 
 data1$time <- ifelse(data1$ind == "t0", 0,
                      ifelse(data1$ind == "t1", 1,
@@ -128,7 +128,7 @@ data2 <- stack(mb)
 txb <- rep("B",length(1:5))
 data2 <- data.frame(data2, txb)
 
-data2$id <- rep(c(6:10))
+data2$identity <- rep(c(6:10))
 
 data2$time <- ifelse(data2$ind == "t0", 0,
                      ifelse(data2$ind == "t1", 1,
@@ -150,22 +150,22 @@ mousedata <- rbind(data1, data2)
 mousedata$ind <- NULL
 
 #renaming columns
-names(mousedata)[names(mousedata) == "values"] <- "wjt"
-names(mousedata)[names(mousedata) == "treatment"] <- "trt"
+names(mousedata)[names(mousedata) == "values"] <- "weight"
+names(mousedata)[names(mousedata) == "treatment"] <- "treatment"
 
 ####################################################################################################################################################################################################################################
 
 #table of means and errors
 library(Rmisc)
 
-table <- summarySE(mousedata, measurevar="wjt", groupvars=c("trt","time"), conf.interval = 0.95)
+table <- summarySE(mousedata, measurevar="weight", groupvars=c("treatment","time"), conf.interval = 0.95)
 
 ####################################################################################################################################################################################################################################
 
 #factoring columns
-mousedata$trt <- as.factor(mousedata$trt)
-mousedata$id <- as.factor(mousedata$id)
-table$trt <- as.factor(table$trt)
+mousedata$treatment <- as.factor(mousedata$treatment)
+mousedata$identity <- as.factor(mousedata$identity)
+table$treatment <- as.factor(table$treatment)
 
 ####################################################################################################################################################################################################################################
 
@@ -176,12 +176,12 @@ library(plyr)
 library(Hmisc)
 
 #ggplot
-graph1 <- ggplot(data = mousedata, aes(x = time, y = wjt, group = id))
+graph1 <- ggplot(data = mousedata, aes(x = time, y = weight, group = identity))
 
 #individual movement
 graphy1 <- graph1 +
-  geom_line(aes(colour=trt)) +
-  geom_point(aes(colour=trt)) + theme_bw() +
+  geom_line(aes(colour=treatment)) +
+  geom_point(aes(colour=treatment)) + theme_bw() +
   theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
   labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") + ylim(0, 30) +
   ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
@@ -189,13 +189,13 @@ graphy1 <- graph1 +
 ####################################################################################################################################################################################################################################
 
 #movement based on means
-graph2 <- ggplot(data = mousedata, aes(x = time, y = wjt, group = trt))
+graph2 <- ggplot(data = mousedata, aes(x = time, y = weight, group = treatment))
 
 #confidence level normal
 graphy2 <- graph2 +
-  stat_summary(fun.y = mean, geom = "point", aes(colour=trt), position = position_dodge(0.1)) +
-  stat_summary(fun.y = mean, geom = "line", aes(colour=trt)) +
-  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", aes(color=trt), width = 0.2, position = position_dodge(0.1)) +
+  stat_summary(fun.y = mean, geom = "point", aes(colour=treatment), position = position_dodge(0.1)) +
+  stat_summary(fun.y = mean, geom = "line", aes(colour=treatment)) +
+  stat_summary(fun.data = mean_cl_normal, geom = "errorbar", aes(color=treatment), width = 0.2, position = position_dodge(0.1)) +
   theme_bw() +
   theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
   labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") + ylim(0, 30) +
@@ -203,9 +203,9 @@ graphy2 <- graph2 +
 
 #standard error
 graphy3 <- graph2 +
-  stat_summary(fun.y = mean, geom = "point", aes(colour=trt), position = position_dodge(0.1)) +
-  stat_summary(fun.y = mean, geom = "line", aes(colour=trt)) +
-  stat_summary(fun.data = mean_se, geom = "errorbar", aes(color=trt), width = 0.2, position = position_dodge(0.1)) +
+  stat_summary(fun.y = mean, geom = "point", aes(colour=treatment), position = position_dodge(0.1)) +
+  stat_summary(fun.y = mean, geom = "line", aes(colour=treatment)) +
+  stat_summary(fun.data = mean_se, geom = "errorbar", aes(color=treatment), width = 0.2, position = position_dodge(0.1)) +
   theme_bw() +
   theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
   labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") + ylim(0, 30) +
@@ -214,11 +214,11 @@ graphy3 <- graph2 +
 ####################################################################################################################################################################################################################################
 
 #new mean and error graph, using sd
-graph3 <- ggplot(table, aes(x=time, y=wjt, group = trt, color=trt))
+graph3 <- ggplot(table, aes(x = time, y=weight, group = treatment, color=treatment))
 
 #standard deviation
 graphy4 <- graph3 +
-  geom_errorbar(aes(ymin = wjt - sd, ymax = wjt + sd), width=0.2, size=0.7, position = position_dodge(0.1)) +
+  geom_errorbar(aes(ymin = weight - sd, ymax = weight + sd), width=0.2, size=0.7, position = position_dodge(0.1)) +
   geom_point(position = position_dodge(0.1)) +
   geom_line() +
   theme_bw() +
@@ -226,6 +226,14 @@ graphy4 <- graph3 +
   labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") + ylim(0, 30) +
   ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
 
+graphy5 <- graph3 +
+  geom_errorbar(aes(ymin = weight - ci, ymax = weight + ci), width=0.2, size=0.7, position = position_dodge(0.1)) +
+  geom_point(position = position_dodge(0.1)) +
+  geom_line() +
+  theme_bw() +
+  theme(axis.title.y = element_text(vjust= 1.8), axis.title.x = element_text(vjust= -0.5), axis.title = element_text(face = "bold")) +
+  labs(x = "Time Points (1 wk)") + labs(y = "Weight (g)") + ylim(0, 30) +
+  ggtitle("Changes in Weights of Individual Mice from Control and Treatment Groups") 
 ####################################################################################################################################################################################################################################
 
 ####################################################################################################################################################################################################################################
